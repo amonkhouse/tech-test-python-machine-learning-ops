@@ -6,10 +6,10 @@ We would like you to complete a classification pipeline.
 
 # Classification
 We use an XGBoost model for predicting the AGE of abalone from physical measurements.
-The AGE of abalone is determined by cutting the shell through the cone and counting the number of rings through a microscope
+The AGE of abalone is determined by cutting the shell through the cone and counting the number of rings through a microscope.
 
 We have prepared a dataset that can be found at ./data/raw_data.csv.
-It is consists of seven numerical and one categorical column. the last column is the class label (Ring) which indicated the age of abalone. 
+It consists of seven numerical and one categorical column. the last column is the class label (Ring) which indicated the age of abalone. 
 
 ## Technical requirements
 
