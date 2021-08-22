@@ -30,7 +30,7 @@ class AbaloneClassifier():
         self.Pipeline.append(self.batch_inference)
 
     def start(self):
-        print('Pipeline started')
+        print('Pipeline started.')
         [step() for step in self.Pipeline]
 
     '''
@@ -39,18 +39,19 @@ class AbaloneClassifier():
     '''
 
     def extract(self):
-        print('Extraction started')
+        print('Extraction started.')
         self.raw_data_frame = PipelineHelpers.extract_data(
             self.input_data_location, self.all_columns)
 
     '''
     In this method, we
-    1- Do the data Transform
-    2- Split the raw data to train and test
+    1- Drop extreme height outliers
+    2- Do the data Transform (one hot encode 'sex' column)
+    3- Split the raw data to train and test
     '''
 
     def preprocess(self):
-        print('Preprocessing started')
+        print('Preprocessing started.')
 
         self.raw_data_frame = PipelineHelpers.remove_outliers(
             self.raw_data_frame, 'height')
@@ -62,17 +63,17 @@ class AbaloneClassifier():
 
     '''
     In this method, we
-    1- Train the model and store the artifacts
+    1- Train the model
+    2- Store the model artifacts
     '''
 
     def train(self):
         if self.train_x is None:
-            print('Training stopped. no input data available')
+            print('Training stopped. No input data available.')
             return
 
         print('Training started')
 
-        # XG-Boost Params; these are passed to create the trained model
         param = {
             "max_depth": "5",
             "eta": "0.2",
@@ -91,7 +92,6 @@ class AbaloneClassifier():
 
         evallist = [(dtrain, 'train'), (dtest, 'eval')]
 
-        # created a trained booster model
         self.model = xgb.train(
             param, dtrain, evals=evallist, num_boost_round=training_epochs, early_stopping_rounds=10)
         self.model.save_model("models/xgboost.model")
@@ -111,10 +111,10 @@ class AbaloneClassifier():
 
     def evaluate(self):
         if not self.model:
-            print('Evaluation stopped. model is not trained')
+            print('Evaluation stopped. Model is not trained.')
             return
 
-        print('model evaluation started')
+        print('Model evaluation started.')
 
         predictions = self.predict(
             self.model, self.test_x, self.test_y, output_margin=True)
@@ -123,7 +123,7 @@ class AbaloneClassifier():
             self.test_y, predictions)
 
         print(
-            f'mean squared error = {self.mean_squared_error}')
+            f'Mean squared error on test set: {self.mean_squared_error}')
 
     '''
     In this method, we
@@ -142,7 +142,7 @@ class AbaloneClassifier():
             return
 
         if self.mean_squared_error < 6.0:
-            print('batch_inference started')
+            print('Batch inference started.')
             batch_data = PipelineHelpers.extract_data(
                 "data/raw_data_batch_transform.csv", columns=self.input_columns)
             encoded_data = PipelineHelpers.encode_column(

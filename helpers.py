@@ -9,10 +9,8 @@ from sklearn.preprocessing import OneHotEncoder
 class PipelineHelpers():
 
     def extract_data(input_data_location: str, columns: list):
-        # load in the data
         raw_data_frame = pd.read_csv(
             input_data_location, encoding='unicode_escape', names=columns).dropna()
-        # shuffle the data
         raw_data_frame = raw_data_frame.sample(
             frac=1).reset_index(drop=True)
         return raw_data_frame
@@ -35,13 +33,11 @@ class PipelineHelpers():
         return ohe
 
     def encode_column(df: pd.DataFrame, column: str, ohe: OneHotEncoder):
-        # encode labels
         encoded_labels = ohe.transform(df[[column]])
         encoded_feature_names = ohe.get_feature_names()
         encoded_labels_df = pd.DataFrame(
             encoded_labels, columns=encoded_feature_names)
 
-        # transform df to include encoded data
         encoded_labels_df.reset_index(drop=True, inplace=True)
         df.reset_index(drop=True, inplace=True)
         processed_data = pd.concat(
