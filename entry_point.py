@@ -30,7 +30,7 @@ class AbaloneClassifier():
         self.Pipeline.append(self.batch_inference)
 
     def start(self):
-        print('pipeline started')
+        print('Pipeline started')
         [step() for step in self.Pipeline]
 
     '''
@@ -39,7 +39,7 @@ class AbaloneClassifier():
     '''
 
     def extract(self):
-        print('extraction started')
+        print('Extraction started')
         self.raw_data_frame = PipelineHelpers.extract_data(
             self.input_data_location, self.all_columns)
 
@@ -50,7 +50,7 @@ class AbaloneClassifier():
     '''
 
     def preprocess(self):
-        print('preprocessing started')
+        print('Preprocessing started')
 
         self.raw_data_frame = PipelineHelpers.remove_outliers(
             self.raw_data_frame, 'height')
@@ -94,6 +94,7 @@ class AbaloneClassifier():
         # created a trained booster model
         self.model = xgb.train(
             param, dtrain, evals=evallist, num_boost_round=training_epochs, early_stopping_rounds=10)
+        self.model.save_model("models/xgboost.model")
 
     def predict(self, model, test_x, test_y=None, output_margin=False):
         if test_y is not None:
