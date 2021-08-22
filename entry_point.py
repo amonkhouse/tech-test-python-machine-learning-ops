@@ -1,9 +1,10 @@
-import pandas as pd
-from scipy.sparse import data
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.model_selection import train_test_split
-import xgboost as xgb
 import numpy as np
+import pandas as pd
+import xgboost as xgb
+from scipy.sparse import data
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder
+
 from helpers import PipelineHelpers
 
 
@@ -61,14 +62,10 @@ class AbaloneClassifier():
     def preprocess(self):
         print('preprocessing started')
 
-        one_hot_encoder = OneHotEncoder(sparse=False)
-        encoded_data = one_hot_encoder.fit_transform(
-            self.raw_data_frame[['sex']])
-        ohe_feature_names = one_hot_encoder.get_feature_names()
-        ohe_df = pd.DataFrame(encoded_data, ohe_feature_names)
-
-        self.processed_data = pd.concat(
-            ohe_df, self.raw_data_frame.drop('sex'))
+        self.raw_data_frame = PipelineHelpers.remove_outliers(
+            self.raw_data_frame, 'height')
+        encoder = PipelineHelpers(self.raw_data_frame, 'sex')
+        processed_df = PipelineHelpers(self.raw_data_frame, 'sex', encoder)
 
     '''
     In this method, we
