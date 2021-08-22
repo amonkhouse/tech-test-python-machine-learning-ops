@@ -54,6 +54,7 @@ if __name__ == "__main__":
     training_data_investigation.unique_sexes()
     training_data_investigation.investigate_outliers("height")
     training_data_investigation.investigate_outliers("shell_weight")
+    
     print("""
     ---------------------------------
     """)

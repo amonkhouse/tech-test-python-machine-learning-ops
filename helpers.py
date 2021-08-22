@@ -9,6 +9,7 @@ from sklearn.preprocessing import OneHotEncoder
 class PipelineHelpers():
 
     def extract_data(input_data_location: str, columns: list):
+        """Load in the data"""
         raw_data_frame = pd.read_csv(
             input_data_location, encoding='unicode_escape', names=columns).dropna()
         raw_data_frame = raw_data_frame.sample(
@@ -16,6 +17,7 @@ class PipelineHelpers():
         return raw_data_frame
 
     def remove_outliers(df: pd.DataFrame, column: str):
+        """Remove any extreme outliers in the provided column"""
         column_values = df[column].to_numpy()
         mean = column_values.mean()
         std = column_values.std()
@@ -28,11 +30,13 @@ class PipelineHelpers():
         return test
 
     def fit_encoder(df: pd.DataFrame, column: str):
+        """Fit the one-hot label encoder"""
         ohe = OneHotEncoder(sparse=False)
         ohe.fit(df[[column]])
         return ohe
 
     def encode_column(df: pd.DataFrame, column: str, ohe: OneHotEncoder):
+        """Use encoder to transform categorical column to one-hot"""
         encoded_labels = ohe.transform(df[[column]])
         encoded_feature_names = ohe.get_feature_names()
         encoded_labels_df = pd.DataFrame(
@@ -49,6 +53,7 @@ class PipelineHelpers():
         return processed_data
 
     def get_train_and_test_sets(df: pd.DataFrame, output_column: list, test_size=0.2):
+        """Get train and test x/y splits"""
         input_data = df.drop(output_column, axis=1)
         output_data = df[output_column]
 
@@ -58,6 +63,7 @@ class PipelineHelpers():
         return train_x, test_x, train_y, test_y
 
     def mean_squared_error(actual: np.array, expected: np.array):
+        """Calculate mean squared error"""
         predicted_diff = actual - expected
         predicted_diff_squared = predicted_diff * predicted_diff
         return predicted_diff_squared.sum() / predicted_diff.size
