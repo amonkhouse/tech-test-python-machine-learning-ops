@@ -78,6 +78,17 @@ class TestPipelineHelpers(TestCase):
         self.assertEqual(expected_test_x_shape, test_x.shape)
         self.assertEqual(expected_test_y_shape, test_y.shape)
 
+    def test_mean_squared_error(self):
+
+        actual = np.array([13, 10, 10])
+        expected = np.array([10, 10, 10])
+
+        actual_mse = 3
+
+        mse = PipelineHelpers.mean_squared_error(expected, actual)
+
+        self.assertEquals(actual_mse, mse)
+
 
 if __name__ == "__main__":
 

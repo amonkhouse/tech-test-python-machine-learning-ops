@@ -1,3 +1,5 @@
+from math import exp
+
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -58,3 +60,8 @@ class PipelineHelpers():
             input_data, output_data, test_size=test_size)
 
         return train_x, test_x, train_y, test_y
+
+    def mean_squared_error(actual: np.array, expected: np.array):
+        predicted_diff = actual - expected
+        predicted_diff_squared = predicted_diff * predicted_diff
+        return predicted_diff_squared.sum() / predicted_diff.size

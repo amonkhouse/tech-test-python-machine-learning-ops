@@ -12,7 +12,6 @@ class AbaloneClassifier():
                  output_column=['ring']):
 
         self.Pipeline = []
-        self.mean_squared_error = 6.0
 
         self.input_columns = input_columns
         self.output_column = output_column
@@ -27,7 +26,7 @@ class AbaloneClassifier():
         self.Pipeline.append(self.extract)
         self.Pipeline.append(self.preprocess)
         self.Pipeline.append(self.train)
-        # self.Pipeline.append(self.evaluate)
+        self.Pipeline.append(self.evaluate)
         # self.Pipeline.append(self.batch_inference)
 
     def start(self):
@@ -116,16 +115,13 @@ class AbaloneClassifier():
 
         print('model evaluation started')
 
-        test_x = self.test_data[['sex', 'length', 'diameter', 'height', 'whole_weight',
-                                 'shucked_weight', 'viscera_weight', 'shell_weight']]
-        test_y = self.test_data[['ring']]
-
         predictions = self.predict(
-            self.model, test_x, test_y, output_margin=True)
+            self.model, self.test_x, self.test_y, output_margin=True)
 
         # TODO: Implement calculation of the mean squared error
 
-        print('mean squared error = {}'.format(self.mean_squared_error))
+        print(
+            f'mean squared error = {PipelineHelpers.mean_squared_error(self.test_y, predictions)}')
 
     '''
     In this method, we
