@@ -58,7 +58,7 @@ if __name__ == "__main__":
     ---------------------------------
     """)
 
-    print("Test data information:")
+    print("Batch data information:")
     batch_data_investigation = DataInvestigation(
         data_location="data/raw_data_batch_transform.csv", output_column=[])
     batch_data_investigation.describe_data()

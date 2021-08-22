@@ -6,13 +6,26 @@ import numpy as np
 
 
 class AbaloneClassifier():
-    def __init__(self):
+    def __init__(self,
+                 input_data_location='data/raw_data.csv',
+                 batch_data_location='data/raw_data_batch_transform.csv',
+                 input_columns=['sex', 'length', 'diameter', 'height', 'whole_weight',
+                                'shucked_weight', 'viscera_weight', 'shell_weight'],
+                 output_column=['ring']):
+
         self.raw_data_frame = None
         self.train_data = None
         self.test_data = None
         self.model = None
         self.Pipeline = []
         self.mean_squared_error = 6.0
+
+        self.input_columns = input_columns
+        self.output_column = output_column
+        self.all_columns = self.input_columns + self.output_column
+
+        self.input_data_location = input_data_location
+        self.batch_data_location = batch_data_location
 
     def pipeline_init(self):
         print('pipeline_init ..')
@@ -24,7 +37,7 @@ class AbaloneClassifier():
         self.Pipeline.append(self.batch_inference)
 
     def start(self):
-        print('pipeline srarted')
+        print('pipeline started')
         [step() for step in self.Pipeline]
 
     '''
@@ -35,13 +48,11 @@ class AbaloneClassifier():
     def extract(self):
         print('extraction started')
 
-        header = ['sex', 'length', 'diameter', 'height', 'whole_weight',
-                  'shucked_weight', 'viscera_weight', 'shell_weight', 'ring']
         self.raw_data_frame = pd.read_csv(
-            'data/raw_data.csv', encoding='unicode_escape', names=header)
+            self.input_data_location, encoding='unicode_escape', names=self.all_columns)
 
         # shuffling the data
-        self.raw_data_frame = self.raw_data_frame .sample(
+        self.raw_data_frame = self.raw_data_frame.sample(
             frac=1).reset_index(drop=True)
 
     '''
