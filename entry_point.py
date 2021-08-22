@@ -1,8 +1,4 @@
-import numpy as np
-import pandas as pd
 import xgboost as xgb
-from scipy.sparse import data
-from sklearn.preprocessing import OneHotEncoder
 
 from helpers import PipelineHelpers
 
@@ -15,10 +11,6 @@ class AbaloneClassifier():
                                 'shucked_weight', 'viscera_weight', 'shell_weight'],
                  output_column=['ring']):
 
-        self.raw_data_frame = None
-        self.train_data = None
-        self.test_data = None
-        self.model = None
         self.Pipeline = []
         self.mean_squared_error = 6.0
 
@@ -35,8 +27,8 @@ class AbaloneClassifier():
         self.Pipeline.append(self.extract)
         self.Pipeline.append(self.preprocess)
         self.Pipeline.append(self.train)
-        self.Pipeline.append(self.evaluate)
-        self.Pipeline.append(self.batch_inference)
+        # self.Pipeline.append(self.evaluate)
+        # self.Pipeline.append(self.batch_inference)
 
     def start(self):
         print('pipeline started')
@@ -63,8 +55,9 @@ class AbaloneClassifier():
 
         self.raw_data_frame = PipelineHelpers.remove_outliers(
             self.raw_data_frame, 'height')
-        encoder = PipelineHelpers(self.raw_data_frame, 'sex')
-        processed_df = PipelineHelpers(self.raw_data_frame, 'sex', encoder)
+        encoder = PipelineHelpers.fit_encoder(self.raw_data_frame, 'sex')
+        processed_df = PipelineHelpers.encode_column(
+            self.raw_data_frame, 'sex', encoder)
         self.train_x, self.test_x, self.train_y, self.test_y = PipelineHelpers.get_train_and_test_sets(
             processed_df, self.output_column[0])
 
@@ -74,11 +67,11 @@ class AbaloneClassifier():
     '''
 
     def train(self):
-        if not self.train_data:
+        if self.train_x is None:
             print('Training stopped. no input data available')
             return
 
-        print('training started')
+        print('Training started')
 
         # XG-Boost Params; these are passed to create the trained model
         param = {
@@ -94,16 +87,8 @@ class AbaloneClassifier():
 
         training_epochs = 350
 
-        train_x = self.train_data[['sex', 'length', 'diameter', 'height', 'whole_weight',
-                                   'shucked_weight', 'viscera_weight', 'shell_weight']]
-        train_y = self.train_data[['ring']]
-
-        test_x = self.test_data[['sex', 'length', 'diameter', 'height', 'whole_weight',
-                                 'shucked_weight', 'viscera_weight', 'shell_weight']]
-        test_y = self.test_data[['ring']]
-
-        dtrain = xgb.DMatrix(train_x, label=train_y)
-        dtest = xgb.DMatrix(test_x, label=test_y)
+        dtrain = xgb.DMatrix(self.train_x, label=self.train_y)
+        dtest = xgb.DMatrix(self.test_x, label=self.test_y)
 
         evallist = [(dtrain, 'train'), (dtest, 'eval')]
 
