@@ -14,7 +14,7 @@ class AbaloneClassifier():
                  batch_data_location='data/raw_data_batch_transform.csv',
                  input_columns=['sex', 'length', 'diameter', 'height', 'whole_weight',
                                 'shucked_weight', 'viscera_weight', 'shell_weight'],
-                 output_column=['ring']):
+                 output_column='ring'):
 
         self.raw_data_frame = None
         self.train_data = None
@@ -25,7 +25,7 @@ class AbaloneClassifier():
 
         self.input_columns = input_columns
         self.output_column = output_column
-        self.all_columns = self.input_columns + self.output_column
+        self.all_columns = self.input_columns.append(self.output_column)
 
         self.input_data_location = input_data_location
         self.batch_data_location = batch_data_location

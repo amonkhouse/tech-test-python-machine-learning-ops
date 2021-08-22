@@ -1,6 +1,9 @@
 import unittest
-import pandas as pd
 from unittest.case import TestCase
+
+import numpy as np
+import pandas as pd
+
 from helpers import PipelineHelpers
 
 
@@ -22,6 +25,23 @@ class TestPipelineHelpers(TestCase):
         expected_df_shape = (30, len(self.test_data_column_names))
 
         self.assertEqual(expected_df_shape, actual_df_shape)
+
+    def test_remove_outliers(self):
+
+        total_not_outliers = 100
+        max_value = 5
+        not_outliers = np.random.randint(max_value, size=total_not_outliers)
+        outlier = max_value * 200
+        all_values = np.append(not_outliers, outlier)
+
+        input_df = pd.DataFrame(
+            {'count': all_values})
+        outliers_removed = PipelineHelpers.remove_outliers(input_df, 'count')
+
+        expected_shape = (100, 1)
+        actual_shape = outliers_removed.shape
+
+        self.assertEquals(expected_shape, actual_shape)
 
     def test_encode_text_column(self):
         input_df = pd.DataFrame({'letter': ['a', 'b', 'c'],

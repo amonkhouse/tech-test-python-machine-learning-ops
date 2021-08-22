@@ -20,7 +20,7 @@ class PipelineHelpers():
         std = column_values.std()
         upper_bound = mean + (std * 3)
 
-        df['contains_outlier'] = df[column] > upper_bound
+        df['contains_outlier'] = np.absolute(df[column]) > upper_bound
         not_outliers = df[df['contains_outlier'] == False]
         return not_outliers.drop('contains_outlier', axis=1)
 
