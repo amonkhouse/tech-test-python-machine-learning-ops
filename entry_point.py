@@ -27,7 +27,7 @@ class AbaloneClassifier():
         self.Pipeline.append(self.preprocess)
         self.Pipeline.append(self.train)
         self.Pipeline.append(self.evaluate)
-        # self.Pipeline.append(self.batch_inference)
+        self.Pipeline.append(self.batch_inference)
 
     def start(self):
         print('pipeline started')
@@ -54,9 +54,9 @@ class AbaloneClassifier():
 
         self.raw_data_frame = PipelineHelpers.remove_outliers(
             self.raw_data_frame, 'height')
-        encoder = PipelineHelpers.fit_encoder(self.raw_data_frame, 'sex')
+        self.encoder = PipelineHelpers.fit_encoder(self.raw_data_frame, 'sex')
         processed_df = PipelineHelpers.encode_column(
-            self.raw_data_frame, 'sex', encoder)
+            self.raw_data_frame, 'sex', self.encoder)
         self.train_x, self.test_x, self.train_y, self.test_y = PipelineHelpers.get_train_and_test_sets(
             processed_df, self.output_column[0])
 
@@ -118,14 +118,15 @@ class AbaloneClassifier():
         predictions = self.predict(
             self.model, self.test_x, self.test_y, output_margin=True)
 
-        # TODO: Implement calculation of the mean squared error
+        self.mean_squared_error = PipelineHelpers.mean_squared_error(
+            self.test_y, predictions)
 
         print(
-            f'mean squared error = {PipelineHelpers.mean_squared_error(self.test_y, predictions)}')
+            f'mean squared error = {self.mean_squared_error}')
 
     '''
     In this method, we
-    1- Batch inference/transform the data raw_data_batch_inference.csv and store the result in another CSV following this format
+    1- Batch inference/transform the data raw_data_batch_transform.csv and store the result in another CSV following this format
 
     original data, prediction
 
@@ -141,9 +142,23 @@ class AbaloneClassifier():
 
         if self.mean_squared_error < 6.0:
             print('batch_inference started')
+            batch_data = PipelineHelpers.extract_data(
+                "data/raw_data_batch_transform.csv", columns=self.input_columns)
+            encoded_data = PipelineHelpers.encode_column(
+                batch_data, 'sex', self.encoder)
+            predictions = self.predict(
+                self.model, encoded_data
+            )
+            batch_data['prediction'] = predictions
+            batch_data.to_csv(
+                "data/raw_data_batch_predictions.csv", header=False, index=False)
+        else:
+            print('Mean squared error is too high, please retrain or tune the model.')
+            return
 
 
 if __name__ == '__main__':
     classifier = AbaloneClassifier()
     classifier.pipeline_init()
     classifier.start()
+    print("Training and predictions finished.")
