@@ -1,8 +1,10 @@
 import pandas as pd
 from scipy.sparse import data
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 import xgboost as xgb
 import numpy as np
+from helpers import PipelineHelpers
 
 
 class AbaloneClassifier():
@@ -47,13 +49,8 @@ class AbaloneClassifier():
 
     def extract(self):
         print('extraction started')
-
-        self.raw_data_frame = pd.read_csv(
-            self.input_data_location, encoding='unicode_escape', names=self.all_columns)
-
-        # shuffling the data
-        self.raw_data_frame = self.raw_data_frame.sample(
-            frac=1).reset_index(drop=True)
+        self.raw_data_frame = PipelineHelpers.extract_data(
+            self.input_data_location, self.all_columns)
 
     '''
     In this method, we
@@ -63,6 +60,15 @@ class AbaloneClassifier():
 
     def preprocess(self):
         print('preprocessing started')
+
+        one_hot_encoder = OneHotEncoder(sparse=False)
+        encoded_data = one_hot_encoder.fit_transform(
+            self.raw_data_frame[['sex']])
+        ohe_feature_names = one_hot_encoder.get_feature_names()
+        ohe_df = pd.DataFrame(encoded_data, ohe_feature_names)
+
+        self.processed_data = pd.concat(
+            ohe_df, self.raw_data_frame.drop('sex'))
 
     '''
     In this method, we
@@ -91,7 +97,7 @@ class AbaloneClassifier():
         training_epochs = 350
 
         train_x = self.train_data[['sex', 'length', 'diameter', 'height', 'whole_weight',
-                                  'shucked_weight', 'viscera_weight', 'shell_weight']]
+                                   'shucked_weight', 'viscera_weight', 'shell_weight']]
         train_y = self.train_data[['ring']]
 
         test_x = self.test_data[['sex', 'length', 'diameter', 'height', 'whole_weight',
@@ -116,8 +122,8 @@ class AbaloneClassifier():
         return model.predict(dtest, output_margin=output_margin)
 
     '''
-    In this method, we 
-    1- Use the trained model to predict the test_data and calculate the mean squared error 
+    In this method, we
+    1- Use the trained model to predict the test_data and calculate the mean squared error
     '''
 
     def evaluate(self):
@@ -139,9 +145,9 @@ class AbaloneClassifier():
         print('mean squared error = {}'.format(self.mean_squared_error))
 
     '''
-    In this method, we 
+    In this method, we
     1- Batch inference/transform the data raw_data_batch_inference.csv and store the result in another CSV following this format
-    
+
     original data, prediction
 
     e.g.
