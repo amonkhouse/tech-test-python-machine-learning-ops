@@ -41,7 +41,7 @@ class TestPipelineHelpers(TestCase):
         expected_shape = (100, 1)
         actual_shape = outliers_removed.shape
 
-        self.assertEquals(expected_shape, actual_shape)
+        self.assertEqual(expected_shape, actual_shape)
 
     def test_encode_text_column(self):
         input_df = pd.DataFrame({'letter': ['a', 'b', 'c'],
@@ -53,7 +53,30 @@ class TestPipelineHelpers(TestCase):
 
         expected_df_shape = (3, 4)
 
-        self.assertEquals(expected_df_shape, processed_data.shape)
+        self.assertEqual(expected_df_shape, processed_data.shape)
+
+    def test_get_train_and_test_sets(self):
+
+        input_columns = ['a', 'b', 'c']
+        output_column = ['d']
+        all_columns = input_columns + output_column
+
+        input_df = pd.DataFrame(np.array([[1, 1, 1, 2],
+                                          [1, 1, 1, 3],
+                                          [1, 1, 1, 4]]),
+                                columns=all_columns)
+
+        train_x, test_x, train_y, test_y = PipelineHelpers.get_train_and_test_sets(
+            input_df, output_column, 0.33)
+
+        expected_train_x_shape = (2, 3)
+        expected_train_y_shape = (2, 1)
+        expected_test_x_shape = (1, 3)
+        expected_test_y_shape = (1, 1)
+        self.assertEqual(expected_train_x_shape, train_x.shape)
+        self.assertEqual(expected_train_y_shape, train_y.shape)
+        self.assertEqual(expected_test_x_shape, test_x.shape)
+        self.assertEqual(expected_test_y_shape, test_y.shape)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 
 
@@ -44,3 +45,12 @@ class PipelineHelpers():
         )
 
         return processed_data
+
+    def get_train_and_test_sets(df: pd.DataFrame, output_column: list, test_size=0.8):
+        input_data = df.drop(output_column, axis=1)
+        output_data = df[output_column]
+
+        train_x, test_x, train_y, test_y = train_test_split(
+            input_data, output_data, test_size=test_size)
+
+        return train_x, test_x, train_y, test_y

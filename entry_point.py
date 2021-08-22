@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import xgboost as xgb
 from scipy.sparse import data
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 
 from helpers import PipelineHelpers
@@ -14,7 +13,7 @@ class AbaloneClassifier():
                  batch_data_location='data/raw_data_batch_transform.csv',
                  input_columns=['sex', 'length', 'diameter', 'height', 'whole_weight',
                                 'shucked_weight', 'viscera_weight', 'shell_weight'],
-                 output_column='ring'):
+                 output_column=['ring']):
 
         self.raw_data_frame = None
         self.train_data = None
@@ -25,7 +24,7 @@ class AbaloneClassifier():
 
         self.input_columns = input_columns
         self.output_column = output_column
-        self.all_columns = self.input_columns.append(self.output_column)
+        self.all_columns = self.input_columns + self.output_column
 
         self.input_data_location = input_data_location
         self.batch_data_location = batch_data_location
@@ -56,7 +55,7 @@ class AbaloneClassifier():
     '''
     In this method, we
     1- Do the data Transform
-    2- Split the raw data to train and and test
+    2- Split the raw data to train and test
     '''
 
     def preprocess(self):
@@ -66,6 +65,8 @@ class AbaloneClassifier():
             self.raw_data_frame, 'height')
         encoder = PipelineHelpers(self.raw_data_frame, 'sex')
         processed_df = PipelineHelpers(self.raw_data_frame, 'sex', encoder)
+        self.train_x, self.test_x, self.train_y, self.test_y = PipelineHelpers.get_train_and_test_sets(
+            processed_df, self.output_column[0])
 
     '''
     In this method, we
