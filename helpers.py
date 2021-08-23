@@ -64,6 +64,13 @@ class PipelineHelpers():
 
     def mean_squared_error(actual: np.array, expected: np.array):
         """Calculate mean squared error"""
+        if actual.size != expected.size:
+            raise DifferentArrayLengthsException(
+                f"Total predicted values not equal to total true values.")
         predicted_diff = actual - expected
         predicted_diff_squared = predicted_diff * predicted_diff
         return predicted_diff_squared.sum() / predicted_diff.size
+
+
+class DifferentArrayLengthsException(Exception):
+    pass

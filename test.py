@@ -4,7 +4,7 @@ from unittest.case import TestCase
 import numpy as np
 import pandas as pd
 
-from helpers import PipelineHelpers
+from helpers import DifferentArrayLengthsException, PipelineHelpers
 
 
 class TestPipelineHelpers(TestCase):
@@ -87,7 +87,16 @@ class TestPipelineHelpers(TestCase):
 
         mse = PipelineHelpers.mean_squared_error(expected, actual)
 
-        self.assertEquals(actual_mse, mse)
+        self.assertEqual(actual_mse, mse)
+
+    def test_test_mean_squared_error_assertion(self):
+
+        one = np.array([1, 1, 1])
+        two = np.array([1, 1])
+
+        self.assertRaises(DifferentArrayLengthsException,
+                          PipelineHelpers.mean_squared_error,
+                          one, two)
 
 
 if __name__ == "__main__":
